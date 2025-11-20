@@ -78,6 +78,7 @@ Visual-Field-Analysis/
 │   ├── uw_vf_example.png
 
 │   └── interpolated_vf_maps
+
 │
 ├── references 
 
@@ -86,6 +87,7 @@ Visual-Field-Analysis/
 │   ├── UWHVF_paper.pdf
 
 │   └── bibliography.txt
+
 │
 ├── eda_glaucoma_shared.ipynb  
 
