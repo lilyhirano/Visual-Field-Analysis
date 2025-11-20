@@ -59,29 +59,44 @@ Standardize VF map formats across the two datasets so that a model trained on on
 # Repository Structure
 
 Visual-Field-Analysis/
+
 │
-├── data/                       
-│   ├── grape/                 
-│   ├── uw/                     
-│   ├── Coord_242.csv           
+├── data/  
+
+│   ├── grape
+
+│   ├── uw
+
+│   ├── Coord_242.csv
+
 │   └── Add here                   
 │
-├── images/                     
+├── images/  
+
 │   ├── grape_vf_example.png
+
 │   ├── uw_vf_example.png
-│   └── interpolated_vf_maps/
+
+│   └── interpolated_vf_maps
 │
-├── references/                 
+├── references 
+
 │   ├── GRAPE_paper.pdf
+
 │   ├── UWHVF_paper.pdf
+
 │   └── bibliography.txt
 │
-├── eda_glaucoma_shared.ipynb   
-├── grape_images.ipynb          
+├── eda_glaucoma_shared.ipynb  
+
+├── grape_images.ipynb      
+
 ├── uw_images.ipynb             
 │
-├── Makefile                    
-├── requirements.txt            
+├── Makefile          
+
+├── requirements.txt  
+
 ├── README.md                  
 │
 └── .gitignore                  
