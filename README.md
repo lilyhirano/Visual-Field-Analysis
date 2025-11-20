@@ -56,6 +56,8 @@ Use longitudinal fields from GRAPE to estimate:
 
 Standardize VF map formats across the two datasets so that a model trained on one dataset can generalize to the other.
 
+# Repository Structure
+
 
 ## Resources
 - GRAPE Dataset
