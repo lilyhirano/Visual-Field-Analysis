@@ -58,8 +58,36 @@ Standardize VF map formats across the two datasets so that a model trained on on
 
 # Repository Structure
 
+Visual-Field-Analysis/
+│
+├── data/                       
+│   ├── grape/                 
+│   ├── uw/                     
+│   ├── Coord_242.csv           
+│   └── Add here                   
+│
+├── images/                     
+│   ├── grape_vf_example.png
+│   ├── uw_vf_example.png
+│   └── interpolated_vf_maps/
+│
+├── references/                 
+│   ├── GRAPE_paper.pdf
+│   ├── UWHVF_paper.pdf
+│   └── bibliography.txt
+│
+├── eda_glaucoma_shared.ipynb   
+├── grape_images.ipynb          
+├── uw_images.ipynb             
+│
+├── Makefile                    
+├── requirements.txt            
+├── README.md                  
+│
+└── .gitignore                  
 
-## Resources
+
+## References
 - GRAPE Dataset
     - [GRAPE: A multi-modal dataset of longitudinal follow-up visual field and fundus images for glaucoma management](https://www.nature.com/articles/s41597-023-02424-4)
     - [GRAPE Dataset](https://springernature.figshare.com/collections/GRAPE_A_multi-modal_glaucoma_dataset_of_follow-up_visual_field_and_fundus_images_for_glaucoma_management/6406319/1)
