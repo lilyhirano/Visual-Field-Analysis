@@ -1,0 +1,92 @@
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans
+from umap import UMAP
+import matplotlib.pyplot as plt
+
+
+data = pd.read_pickle('./pkl_data/GRAPE.pkl')
+
+def create_VFdata(df):
+    patients = []
+    masks = []
+    for i, row in df.iterrows():
+        visits = []
+        mask = []
+
+        for val in row:
+            if isinstance(val, float) and pd.isna(val):
+                visits.append(np.full_like(df.iloc[0,0], np.nan, dtype=float))
+                mask.append(0)
+            else:
+                visits.append(np.array(val, dtype=float))
+                mask.append(1)
+
+        patients.append(np.stack(visits))
+        masks.append(np.array(mask, dtype=int))
+    return np.array(patients, dtype=float), np.array(masks, dtype=int)
+
+        
+def scale_VF_data(patients, masks):
+    flat = patients.reshape(-1, patients.shape[-1])
+    mask_flat = masks.reshape(-1, 1)
+
+
+    valid_rows = flat[mask_flat[:,0]==1]
+    scaler = StandardScaler()
+    scaler.fit(valid_rows) #only fit on rows with values
+
+    flat_scaled = scaler.transform(flat)  #NaN ignored, still flat
+
+    return flat_scaled, valid_rows
+
+
+
+def find_PCA_emb(patients, flat_scaled, valid_rows, n=7):
+    N, T, P = patients.shape
+    pca = PCA(n_components=n)
+    pca.fit(valid_rows)
+    flat_visits_emb = pca.transform(np.nan_to_num(flat_scaled, nan=0.0)) #make NaN 0.0 to avoid errors
+
+    visit_emb = flat_visits_emb.reshape(N, T, n)
+
+    return visit_emb
+
+
+def get_features(visit_emb, masks):
+
+    diffs = np.diff(visit_emb, axis=1)
+    mean_slope = np.sum(diffs * masks[:,1:,None], axis=1) / np.sum(masks[:,1:], axis=1)[:,None]
+
+    mean_emb = np.sum(visit_emb * masks[:, :, None], axis=1) / np.sum(masks, axis=1)[:, None]
+
+    patient_features = np.concatenate([mean_emb, mean_slope], axis=1)
+    return patient_features
+
+
+def kmean_clustering(patient_features, c=4):
+    kmeans = KMeans(n_clusters=c)
+    labels = kmeans.fit_predict(patient_features)
+
+    return labels
+
+def visualize(patient_features, labels):
+    umap = UMAP(n_neighbors=8, min_dist=0.1)
+    emb_2d = umap.fit_transform(patient_features)
+
+    plt.scatter(emb_2d[:,0], emb_2d[:,1], c=labels, s=50)
+    plt.xlabel('UMAP1')
+    plt.ylabel('UMAP2')
+    plt.title('Patient VF Trajectory Embeddings')
+    plt.savefig('unsupervised_model/pt_clustering.png')
+
+
+patients, masks = create_VFdata(data)
+flat_scaled, valid_rows = scale_VF_data(patients, masks)
+visit_emb = find_PCA_emb(patients, flat_scaled, valid_rows, n=7)
+patient_features = get_features(visit_emb, masks)
+labels = kmean_clustering(patient_features, c=4)
+visualize(patient_features, labels)
+
