@@ -20,16 +20,16 @@ def main():
 
     # 1. Load UW visual field data
 
-        vf_path = data_dir / "UW_VF_Data.csv"
+    vf_path = data_dir / "UW_VF_Data.csv"
 
     vf_df = pd.read_csv(vf_path)
     print("VF data shape:", vf_df.shape)
     print("Columns:", vf_df.columns)
 
 
-        # 2. Build per-eye baseline table
-    #    Use PatID + Eye as unique eye identifier
-    #    Baseline = earliest Time_from_Baseline per eye
+    # 2. Build per-eye baseline table
+    # Use PatID + Eye as unique eye identifier
+    # Baseline = earliest Time_from_Baseline per eye
 
     
     vf_df["EyeID"] = vf_df["PatID"].astype(str) + "_" + vf_df["Eye"].astype(str)
