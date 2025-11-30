@@ -24,8 +24,16 @@ Results
 
 <img width="2400" height="1800" alt="RFR" src="https://github.com/user-attachments/assets/2bb1f6d8-ed64-4085-9571-ed220546bb1c" />
 
+The bar plot indicates that the Model's Mean Sensitivity (MS) is overwhelmingly important for the model's predictions, while nearly all of the Random Forest's importance weights are assigned to MS. All other features (MS clusters and individual PDs) provide relative little additional value to the model. This occurs because MS provides a global overview of the entire field of view. Since MS provides nearly all of the data needed to understand how damaged the eye is, the model was trained to predict MS. Therefore, the Forest simply learned that MS predicts MS, giving it an importance score of nearly 1.0.
+
+
 <img width="4200" height="750" alt="image" src="https://github.com/user-attachments/assets/122c13bd-f885-4de2-b6f5-b675b7201fc8" />
 
+Temperatures in the proximity temperature deviation heatmap are exclusively focused on the pattern deviation characteristics of the VFs and scale the influence of the characteristics against one another. While the amount of contribution made by each feature to the model is very small in absolute terms, the heatmap indicates which of those features have a higher relative impact than others. Examples of such features with greater relative importance include PD_36, PD_11, and PD_19. These points are often found in medically significant/good locations (nasal stepara, arecla zone), where, traditionally, glaucomatous changes are first found.
+
+Hence, although the heatmap by itself is not necessarily predictive of future VF changes, it does identify which VFs are likely to be significant to a patient if their particular patient is not already affected by primary major conditions.
+
+Overall, 
 
 The model performed extremely well:
 
