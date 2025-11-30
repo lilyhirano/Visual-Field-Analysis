@@ -3,15 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class Analyzer():
-    def __init__(self, labels, patients, masks):
-        self.coords = np.array([        #octopus 900 coordinates
-    (0,0), (1,-1), (-1,-1), (-1,1), (1,1), (2,-2), (-2,-2), (-2,2),
-    (2,2), (4,-1), (4,-4), (1,-4), (-1,-4), (-4,-4), (-4,-1), (-4,1), (-4,4),
-    (-1,4), (1,4), (4,4), (4,1), (6,0), (6,-6), (2,-6), (-2,-6), (-6,-6),
-    (-6,-1), (-6,1), (-6,6), (-2,6), (2,6), (6,6), (8,-1), (8,-6), (8,-8), (6,-8), (2,-8), 
-    (-2,-8), (-6,-8), (-8,-8), (-8,-6), (-8,-1), (-8,1), (-8,6), (-8,8), (-6,8), (-2,8), (2,8), (6,8),
-    (8,8), (8,6), (8,1), (10,-3), (3,-10), (-3,-10), (-10, -2), (-10,2), (-3,10), (3,10), (10,3)
-    ])
+    def __init__(self, labels, patients, masks, coords):
+        self.coords = coords
         self.patients = patients
         self.masks = masks
         self.labels = labels
@@ -36,7 +29,7 @@ class Analyzer():
         rbf = Rbf(self.coords[:,0], self.coords[:,1], values, function='thin_plate')
         grid_z = rbf(grid_x, grid_y)
 
-        radius = 12
+        radius = 11.5
         mask = np.sqrt(grid_x**2 + grid_y**2) <= radius     # circular mask
         masked_grid = np.where(mask, grid_z, np.nan)
 
@@ -48,19 +41,30 @@ class Analyzer():
         
         return image
     
-    def _plot_interp_feature(self, feature, cmap = 'viridis', title = ''):
+    def _plot_interp_feature(self, feature, cmap = 'viridis', title = '', use_vminmax = True):
         fig, axes = plt.subplots(1, self.n_clusters, figsize=(4*self.n_clusters, 5))
 
-        all_vals = np.concatenate([feature[c] for c in self.clusters])
-        vmin, vmax = all_vals.min(), all_vals.max()
+        if use_vminmax:
+            all_vals = np.concatenate([feature[c] for c in self.clusters])
+            vmin, vmax = all_vals.min(), all_vals.max()
+            for ax, c in zip(axes, self.clusters):
+                values = feature[c]
+                im = self._plot_interpolated_vf(values, ax=ax,
+                                        cmap=cmap, title=f"Cluster {c}", vmin=vmin, vmax=vmax)
 
-        for ax, c in zip(axes, self.clusters):
-            values = feature[c]
-            im = self._plot_interpolated_vf(values, ax=ax,
-                                    cmap=cmap, title=f"Cluster {c}", vmin=vmin, vmax=vmax)
+            fig.colorbar(im, ax=axes.ravel().tolist(), shrink=0.6)
+            fig.suptitle(title, fontsize=25)
+        else:
+            all_vals = np.concatenate([feature[c] for c in self.clusters])
+            vmin, vmax = all_vals.min(), all_vals.max()
+            for ax, c in zip(axes, self.clusters):
+                values = feature[c]
+                im = self._plot_interpolated_vf(values, ax=ax,
+                                        cmap=cmap, title=f"Cluster {c}", vmin=None, vmax=None)
+                fig.colorbar(im, ax=ax, shrink=0.6)  
 
-        fig.colorbar(im, ax=axes.ravel().tolist(), shrink=0.6)
-        fig.suptitle(title, fontsize=25)
+            fig.suptitle(title, fontsize=25)
+
         return plt
 
     def show_label_distribution(self):
@@ -112,25 +116,14 @@ class Analyzer():
         plot.savefig('unsupervised_model/mean_final.png')
 
     def show_mean_change(self):
-        diff_means = {c: self.last_means[c]- self.baseline_means[c] for c in self.clusters.keys()}
+        self.diff_means = {c: self.last_means[c]- self.baseline_means[c] for c in self.clusters.keys()}
     
-        plot = self._plot_interp_feature(diff_means, cmap='coolwarm_r', title = 'Mean Change in VF by Cluster')
+        plot = self._plot_interp_feature(self.diff_means, cmap='coolwarm_r', title = 'Mean Change in VF by Cluster', use_vminmax=True)
         plot.savefig('unsupervised_model/mean_change.png')
 
-    def show_mean_prog_slope(self):
-        mean_slope = np.zeros((self.N, self.P))
-
-        for i in range(self.N):
-            valid_visits = self.patients[i][self.masks[i]==1]  #real visits only
-            diffs = np.diff(valid_visits, axis=0)  # difference between consecutive visits
-            mean_slope[i] = np.mean(diffs, axis=0)  # average slope per location
-
-        cluster_slope_vf = {}
-        for c, idx in self.clusters.items():
-            cluster_slope_vf[c] = np.mean(mean_slope[idx], axis=0)
-
-        plot = self._plot_interp_feature(mean_slope, cmap='coolwarm_r', title = 'Mean Progression Slope per Cluster')
-        plot.savefig('unsupervised_model/mean_slope.png')
+    def show_mean_change_per_cluster(self):
+        plot = self._plot_interp_feature(self.diff_means, cmap='coolwarm_r', title = 'Mean Change in VF Within Each Cluster', use_vminmax=False)
+        plot.savefig('unsupervised_model/mean_change_individual.png')
 
     def run_all(self):
         '''
@@ -146,8 +139,8 @@ class Analyzer():
         self.show_mean_final()
         print('Mean Change...')
         self.show_mean_change()
-        print('Mean Progression Slope...')
-        self.show_mean_prog_slope()
+        print('Mean Change Per Cluster...')
+        self.show_mean_change_per_cluster()
             
         print('Done')
             
