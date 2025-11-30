@@ -33,7 +33,7 @@ Temperatures in the proximity temperature deviation heatmap are exclusively focu
 
 Hence, although the heatmap by itself is not necessarily predictive of future VF changes, it does identify which VFs are likely to be significant to a patient if their particular patient is not already affected by primary major conditions.
 
-Overall, 
+Overall, The global sensitivity score (MS) is the primary source of knowledge for the model, however, if only the PD features are assessed separately, we can see some geographic clustering of those VF locations that are contributing slightly more than others, which follows the traditional patterns of glandular damage in glaucoma.
 
 The model performed extremely well:
 
