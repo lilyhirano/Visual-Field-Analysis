@@ -35,7 +35,7 @@ R²: 1.0000
 
 Feature Importance
 
-The feature importance plot showed that baseline mean sensitivity (MS) almost completely dominated the prediction. All other features—including PD points and MS cluster values—contributed very little.
+The feature importance plot showed that baseline `mean sensitivity` (MS) almost completely dominated the prediction. All other features—including PD points and MS cluster values—contributed very little.
 
 This suggests that MS_Cluster3 is strongly determined by MS in this dataset, making the prediction task nearly redundant.
 
