@@ -1,57 +1,43 @@
-# Random Forest Regression for Glaucoma Progression (UW Dataset)
-**Course:** Chem 277B – Machine Learning Algorithms  
-**Project:** Visual Field Analysis for Glaucoma Prediction  
-**Dataset:** University of Washington Biomedical AI Visual Fields (UWHVF)
+Random Forest Regression – UW Visual Field Dataset
 
-## Overview
-This model predicts glaucoma progression by estimating the **mean sensitivity slope** (MS_slope, dB/year) for each eye. The slope represents the annual rate of functional vision loss, with more negative values indicating faster deterioration. We focused on how well baseline visual field (VF) patterns can predict future decline.
+This folder contains a Random Forest model trained on the University of Washington Visual Field (UW VF) dataset to predict MS_Cluster3 from baseline visual field measurements.
 
-## Pipeline
-build_feature_matrix.py → train_test_split.py → define_and_train_RFR.py → evaluate_model.py → RFR_feature_importance.py
+Overview
 
+Each eye is represented by its first available visual field test, and we use baseline measurements such as global mean sensitivity (MS), cluster-level MS values, and pattern deviation (PD) features. The goal is to see how well these baseline signals can predict MS_Cluster3.
 
-## Feature Construction
-For each eye, we used only the **first recorded VF test** (baseline). Baseline inputs included:
+Methods
 
-- Mean Sensitivity (MS)
-- Age at visit
-- Follow-up duration (years)
-- Raw 54-point sensitivity grid (optional, if included)
+We trained a RandomForestRegressor with:
 
-Each row represents one eye.
+200 trees
 
-## Model
-We used a **RandomForestRegressor** with:
+minimum leaf size of 3
 
-- `n_estimators = 200`
-- `min_samples_leaf = 3`
-- `random_state = 42`
-- 80/20 train–test split
+80/20 train–test split
 
-This ensemble model captures non-linear interactions across VF locations and patient-level variables.
+random seed = 42
 
-## Results
-On the held-out test set, the model achieved:
+Missing values in the feature matrix were filled using column means.
 
-- **MAE:** [MAE_here] dB/year  
-- **RMSE:** [RMSE_here] dB/year  
-- **R²:** [R2_here]  
+Results
 
-(Replace with your actual values after running.)
+The model performed extremely well:
 
-## Feature Importance
-The Random Forest produced a ranked list of influential features. The most predictive variables were:
+MAE: 0.0060
 
-- Baseline mean sensitivity (MS)
-- Follow-up duration
-- Several peripheral sensitivity points in glaucomatous regions (arcuate and nasal areas)
+RMSE: 0.0375
 
-This supports known clinical patterns of glaucomatous field loss.
+R²: 1.0000
 
-## Interpretation
-A relatively simple ensemble model can capture clinically meaningful structure in the VF data. Baseline VF measurements contain enough signal to provide a rough estimate of future decline, demonstrating that traditional tree-based models still perform strongly on structured ophthalmic data.
+Feature Importance
 
+The feature importance plot showed that baseline mean sensitivity (MS) almost completely dominated the prediction. All other features—including PD points and MS cluster values—contributed very little.
 
-To model glaucoma progression on the UW dataset, we trained a RandomForestRegressor to predict the mean sensitivity slope (MS_slope, dB/year) for each eye based on baseline visual field measurements and patient metadata. Each eye was represented by its first recorded VF test (baseline mean sensitivity, age, follow-up duration, and optionally all 54 sensitivity points). We randomly split the data into 80% training and 20% testing sets and used a forest with 200 trees and a minimum of 3 samples per leaf.
+This suggests that MS_Cluster3 is strongly determined by MS in this dataset, making the prediction task nearly redundant.
 
-On the held-out test set, the model achieved a mean absolute error of [MAE_here] dB/year, a root mean squared error of [RMSE_here] dB/year, and an R² score of [R2_here]. Feature importance analysis suggested that baseline mean sensitivity, follow-up duration, and several peripheral sensitivity locations contributed most strongly to the predictions. These results indicate that a relatively simple ensemble of decision trees can capture non-linear relationships between baseline VF patterns and future progression rates.
+Conclusion
+
+The Random Forest achieved near-perfect accuracy, but mostly because MS_Cluster3 can be inferred almost directly from MS. Instead of revealing complex nonlinear patterns, the model exposed a strong internal relationship in the dataset. While the model technically performs well, the task may not represent true progression prediction.
+
+A more meaningful next step would be to model future MS, change over time, or disease classification, where baseline features would play a more informative role.
