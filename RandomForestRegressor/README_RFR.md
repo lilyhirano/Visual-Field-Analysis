@@ -6,6 +6,10 @@
 ## Overview
 This model predicts glaucoma progression by estimating the **mean sensitivity slope** (MS_slope, dB/year) for each eye. The slope represents the annual rate of functional vision loss, with more negative values indicating faster deterioration. We focused on how well baseline visual field (VF) patterns can predict future decline.
 
+## Pipeline
+build_feature_matrix.py → train_test_split.py → define_and_train_RFR.py → evaluate_model.py → RFR_feature_importance.py
+
+
 ## Feature Construction
 For each eye, we used only the **first recorded VF test** (baseline). Baseline inputs included:
 
