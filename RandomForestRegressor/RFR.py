@@ -9,26 +9,23 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
-# Loading the UW visual field data (single CSV)
-
-# per-visit VF tests (includes MS, MS_slope, etc.):
+# 1. Load the UW visual field data (single CSV)
 
 vf_path = "data/UW_VF_Data.csv"
 
 vf_df = pd.read_csv(vf_path)
 print("VF data shape:", vf_df.shape)
+print("Columns:", vf_df.columns)
 
-# Building per-eye baseline table
+# 2. Build per-eye baseline table
+# Use PatID (patient id) and Eye (OD/OS) to define a unique eye
 
-# Create a unique eye ID to join visits from the same eye:
+vf_df["EyeID"] = vf_df["PatID"].astype(str) + "_" + vf_df["Eye"].astype(str)
 
-vf_df["EyeID"] = vf_df["<patient_column_name>"].astype(str) + "_" + vf_df["<eye_column_name>"].astype(str)
-
-# Baseline = smallest visit index or earliest time:
-
+# Baseline = earliest time from baseline for each EyeID
 baseline_vf = (
     vf_df
-    .sort_values(["EyeID", "Visit"])
+    .sort_values(["EyeID", "Time_from_Baseline"])
     .groupby("EyeID")
     .first()
     .reset_index()
@@ -36,9 +33,7 @@ baseline_vf = (
 
 print("Baseline VF shape:", baseline_vf.shape)
 
-# For downstream code, use 'merged' as the baseline dataset
-
+# For downstream code, we will refer to this as 'merged'
 merged = baseline_vf.copy()
-
 print("Merged shape:", merged.shape)
 merged.head()
