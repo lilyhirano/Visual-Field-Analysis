@@ -1,12 +1,12 @@
-Random Forest Regression – UW Visual Field Dataset
+# Random Forest Regression – UW Visual Field Dataset
 
 This folder contains a Random Forest model trained on the University of Washington Visual Field (UW VF) dataset to predict MS_Cluster3 from baseline visual field measurements.
 
-Overview
+# Overview
 
 Each eye is represented by its first available visual field test, and we use baseline measurements such as global mean sensitivity (MS), cluster-level MS values, and pattern deviation (PD) features. The goal is to see how well these baseline signals can predict MS_Cluster3.
 
-Methods
+# Methods
 
 We trained a RandomForestRegressor with:
 
@@ -35,7 +35,7 @@ Hence, although the heatmap by itself is not necessarily predictive of future VF
 
 Overall, The global sensitivity score (MS) is the primary source of knowledge for the model, however, if only the PD features are assessed separately, we can see some geographic clustering of those VF locations that are contributing slightly more than others, which follows the traditional patterns of glandular damage in glaucoma.
 
-The model performed extremely well:
+# The model performed extremely well:
 
 MAE: 0.0060
 
@@ -43,14 +43,36 @@ RMSE: 0.0375
 
 R²: 1.0000
 
-Feature Importance
+# Feature Importance
 
 The feature importance plot showed that baseline `mean sensitivity` (MS) almost completely dominated the prediction. All other features—including PD points and MS cluster values—contributed very little.
 
 This suggests that MS_Cluster3 is strongly determined by MS in this dataset, making the prediction task nearly redundant.
 
-Conclusion
+# Conclusion
 
 The Random Forest achieved near-perfect accuracy, but mostly because MS_Cluster3 can be inferred almost directly from MS. Instead of revealing complex nonlinear patterns, the model exposed a strong internal relationship in the dataset. While the model technically performs well, the task may not represent true progression prediction.
 
 A more meaningful next step would be to model future MS, change over time, or disease classification, where baseline features would play a more informative role.
+
+
+# Choosing the Right Target: MS vs. MS_slope
+
+How you use Mean Sensitivity (MS) depends on the goal of the analysis:
+
+1. Using MS as the target (severity prediction)
+
+This is the setting used in our current Random Forest model.
+The goal is to predict the overall severity of the visual field from other VF features.
+This could be useful if a clinic only had PD maps or cluster values and wanted to estimate MS.
+
+However, because MS is also included in the input features, the model mostly learns to reproduce MS directly.
+If MS is the prediction target, it should be removed from the feature list to avoid this identity effect.
+
+2. Using MS_slope as the target (glaucoma progression)
+
+A more clinically meaningful option is to predict MS_slope, which measures how quickly MS declines over time (dB/year).
+This provides insight into which patients may progress faster and which VF regions are early indicators of future loss.
+
+In this case, keeping baseline MS in the features is appropriate because a lower MS often correlates with faster decline, but MS itself is not identical to the slope.
+Random Forest can then use MS along with the PD map and cluster features to learn non-linear patterns related to disease progression.
