@@ -1,3 +1,4 @@
+# RFR.py
 # Random Forest Regression / Severity Prediction for UW Visual Field Data
 
 import numpy as np
@@ -10,16 +11,20 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 
 def main():
+    # -------------------------------------------------------------
     # 1. Load UW visual field data
+    # -------------------------------------------------------------
     vf_path = "data/UW_VF_Data.csv"
 
     vf_df = pd.read_csv(vf_path)
     print("VF data shape:", vf_df.shape)
     print("Columns:", vf_df.columns)
 
+    # -------------------------------------------------------------
     # 2. Build per-eye baseline table
     #    Use PatID + Eye as unique eye identifier
     #    Baseline = earliest Time_from_Baseline per eye
+    # -------------------------------------------------------------
     vf_df["EyeID"] = vf_df["PatID"].astype(str) + "_" + vf_df["Eye"].astype(str)
 
     baseline_vf = (
@@ -36,8 +41,9 @@ def main():
     merged = baseline_vf.copy()
     print("Merged shape:", merged.shape)
 
+    # -------------------------------------------------------------
     # 3. Feature selection
-
+    # -------------------------------------------------------------
     # Basic features
     basic_features = ["MS", "Age", "Time_from_Baseline"]
 
@@ -47,29 +53,39 @@ def main():
     # MS cluster features
     cluster_features = [c for c in merged.columns if c.startswith("MS_Cluster")]
 
-    feature_cols = basic_features + pd_features + cluster_features
+       feature_cols = basic_features + pd_features + cluster_features
 
     print("Using", len(feature_cols), "features.")
 
-    # 4. Build model dataframe (drop missing)
-    # NOTE: Dataset does not include MS_slope directly here, so we use
-    # MS_Cluster3 as a proxy target (severity). You can swap this later
-    # if you add a real slope column.
+    # -------------------------------------------------------------
+    # 4. Build model dataframe (only require target to be present)
+    # -------------------------------------------------------------
     target_col = "MS_Cluster3"
 
-    model_df = merged.dropna(subset=feature_cols + [target_col])
+    # Keep rows where target is not NaN
+    mask = merged[target_col].notna()
+    y = merged.loc[mask, target_col].values
 
-    X = model_df[feature_cols].values
-    y = model_df[target_col].values
+    # Take features for those rows and fill missing values
+    X_df = merged.loc[mask, feature_cols].copy()
 
-    print("Model dataframe shape:", model_df.shape)
+    # Fill NaNs in features with column means
+    X_df = X_df.fillna(X_df.mean(numeric_only=True))
 
+    X = X_df.values
+
+    print("Model dataframe shape:", X_df.shape)
+
+    # -------------------------------------------------------------
     # 5. Train/test split
+    # -------------------------------------------------------------
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
 
+    # -------------------------------------------------------------
     # 6. Train Random Forest
+    # -------------------------------------------------------------
     rf = RandomForestRegressor(
         n_estimators=200,
         min_samples_leaf=3,
@@ -80,7 +96,9 @@ def main():
     rf.fit(X_train, y_train)
     y_pred = rf.predict(X_test)
 
+    # -------------------------------------------------------------
     # 7. Evaluation
+    # -------------------------------------------------------------
     mae = mean_absolute_error(y_test, y_pred)
     rmse = mean_squared_error(y_test, y_pred, squared=False)
     r2 = r2_score(y_test, y_pred)
@@ -89,16 +107,20 @@ def main():
     print(f"RMSE: {rmse:.4f}")
     print(f"R^2: {r2:.4f}")
 
+    # Save results into the RandomForestRegressor folder
     results_path = "RandomForestRegressor/RFR_results.txt"
     with open(results_path, "w") as f:
         f.write("RandomForestRegressor – UW dataset\n")
+        f.write("----------------------------------\n")
         f.write(f"MAE:  {mae:.4f}\n")
         f.write(f"RMSE: {rmse:.4f}\n")
         f.write(f"R^2:  {r2:.4f}\n")
 
     print(f"Saved metrics to {results_path}")
 
+    # -------------------------------------------------------------
     # 8. Feature importance plot
+    # -------------------------------------------------------------
     importances = rf.feature_importances_
     idx = np.argsort(importances)[::-1][:15]  # top 15
 
