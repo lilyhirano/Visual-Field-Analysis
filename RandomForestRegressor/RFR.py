@@ -22,7 +22,7 @@ print("VF data shape:", vf_df.shape)
 
 # Create a unique eye ID to join visits from the same eye:
 
-vf_df["EyeID"] = vf_df["PatientID"].astype(str) + "_" + vf_df["Eye"].astype(str)
+vf_df["EyeID"] = vf_df["<patient_column_name>"].astype(str) + "_" + vf_df["<eye_column_name>"].astype(str)
 
 # Baseline = smallest visit index or earliest time:
 
