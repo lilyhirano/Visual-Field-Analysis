@@ -22,6 +22,9 @@ Missing values in the feature matrix were filled using column means.
 
 Results
 
+<img width="2400" height="1800" alt="RFR" src="https://github.com/user-attachments/assets/2bb1f6d8-ed64-4085-9571-ed220546bb1c" />
+
+
 The model performed extremely well:
 
 MAE: 0.0060
