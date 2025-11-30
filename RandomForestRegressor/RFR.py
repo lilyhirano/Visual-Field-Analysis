@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from pathlib import Path
+
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -12,9 +14,17 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 def main():
     # -------------------------------------------------------------
+    # 0. Resolve project paths independent of where script is run
+    # -------------------------------------------------------------
+    this_file = Path(__file__).resolve()
+    project_root = this_file.parents[1]          # .../Visual-Field-Analysis
+    data_dir = project_root / "data"
+    rfr_dir = project_root / "RandomForestRegressor"
+
+    # -------------------------------------------------------------
     # 1. Load UW visual field data
     # -------------------------------------------------------------
-    vf_path = "data/UW_VF_Data.csv"
+    vf_path = data_dir / "UW_VF_Data.csv"
 
     vf_df = pd.read_csv(vf_path)
     print("VF data shape:", vf_df.shape)
@@ -59,8 +69,9 @@ def main():
 
     # -------------------------------------------------------------
     # 4. Build model dataframe (only require target to be present)
+    #    Use MS (mean sensitivity) as regression target
     # -------------------------------------------------------------
-    target_col = "MS_Cluster3"
+    target_col = "MS"
 
     # Keep rows where target is not NaN
     mask = merged[target_col].notna()
@@ -109,8 +120,8 @@ def main():
     print(f"R^2: {r2:.4f}")
 
     # Save results into the RandomForestRegressor folder
-    results_path = "RandomForestRegressor/RFR_results.txt"
-    with open(results_path, "w") as f:
+    results_path = rfr_dir / "RFR_results.txt"
+    with results_path.open("w") as f:
         f.write("RandomForestRegressor – UW dataset\n")
         f.write("----------------------------------\n")
         f.write(f"MAE:  {mae:.4f}\n")
@@ -137,7 +148,7 @@ def main():
     plt.title("Random Forest Feature Importances (UW VF baseline)")
     plt.tight_layout()
 
-    fig_path = "RandomForestRegressor/RFR_feature_importance.png"
+    fig_path = rfr_dir / "RFR_feature_importance.png"
     plt.savefig(fig_path, dpi=300)
     plt.close()
 
