@@ -129,7 +129,7 @@ def main():
     # 8. Feature importance bar plot
     
     importances = rf.feature_importances_
-    idx = np.argsort(importances)[::-1][:15]  # top 15
+    idx = np.argsort(importances)[::-1][:15]  
 
     plt.figure(figsize=(8, 6))
     plt.bar(range(len(idx)), importances[idx])
@@ -149,35 +149,46 @@ def main():
 
     print(f"Saved feature importance plot to {fig_path}")
 
-    # 9. PD-feature importance heatmap
+    # 9. PD-feature importance heatmap (top PD features only)
     # Map importances to feature names
-    
     fi_series = pd.Series(importances, index=feature_cols)
 
     # Keep only PD_* features
     pd_importances = fi_series[pd_features]
 
     if len(pd_importances) > 0:
-        plt.figure(figsize=(8, 2))
-        # 1 x N heatmap of PD feature importances
-        plt.imshow(
-            pd_importances.values.reshape(1, -1),
-            aspect="auto"
-        )
-        plt.colorbar(label="Importance")
-        plt.xticks(
-            range(len(pd_importances)),
-            pd_importances.index,
-            rotation=45,
-            ha="right",
-        )
-        plt.yticks([0], ["PD importance"])
-        plt.title("Random Forest PD Feature Importance Heatmap")
-        plt.tight_layout()
+        # Sort PD features by importance (largest first)
+        pd_importances = pd_importances.sort_values(ascending=False)
+
+        # Keep only the top K PD points for readability
+        top_k = min(20, len(pd_importances))  # show up to 20
+        pd_importances = pd_importances.iloc[:top_k]
+
+        # Normalize to [0, 1] so the color scale is easier to see
+        vals = pd_importances.values
+        if vals.max() > 0:
+            vals = vals / vals.max()
+
+        # Make a wider, short heatmap so labels are readable
+        fig_width = 0.6 * top_k + 2  # scale width with number of features
+        fig, ax = plt.subplots(figsize=(fig_width, 2.5))
+
+        im = ax.imshow(vals.reshape(1, -1), aspect="auto")
+
+        cbar = fig.colorbar(im, ax=ax)
+        cbar.set_label("Relative importance")
+
+        ax.set_xticks(np.arange(top_k))
+        ax.set_xticklabels(pd_importances.index, rotation=45, ha="right", fontsize=7)
+        ax.set_yticks([0])
+        ax.set_yticklabels(["PD importance"], fontsize=8)
+
+        ax.set_title("Random Forest PD Feature Importance (top PD points)")
+        fig.tight_layout()
 
         heat_path = rfr_dir / "RFR_PD_importance_heatmap.png"
-        plt.savefig(heat_path, dpi=300)
-        plt.close()
+        fig.savefig(heat_path, dpi=300)
+        plt.close(fig)
 
         print(f"Saved PD importance heatmap to {heat_path}")
     else:
