@@ -64,7 +64,7 @@ def main():
     print("Using", len(feature_cols), "features.")
 
     # 4. Build model dataframe (only require target to be present)
-    #    Use MS (mean sensitivity) as regression target
+    # Use MS (mean sensitivity) as regression target
     
     target_col = "MS"
 
@@ -151,6 +151,7 @@ def main():
 
     # 9. PD-feature importance heatmap (top PD features only)
     # Map importances to feature names
+    
     fi_series = pd.Series(importances, index=feature_cols)
 
     # Keep only PD_* features
