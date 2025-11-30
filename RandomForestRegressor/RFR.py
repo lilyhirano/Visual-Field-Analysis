@@ -1,4 +1,3 @@
-# RFR.py
 # Random Forest Regression / Severity Prediction for UW Visual Field Data
 
 import numpy as np
@@ -13,28 +12,24 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 
 def main():
-    # -------------------------------------------------------------
-    # 0. Resolve project paths independent of where script is run
-    # -------------------------------------------------------------
     this_file = Path(__file__).resolve()
-    project_root = this_file.parents[1]          # .../Visual-Field-Analysis
+    project_root = this_file.parents[1]       
     data_dir = project_root / "data"
     rfr_dir = project_root / "RandomForestRegressor"
 
-    # -------------------------------------------------------------
-    # 1. Load UW visual field data
-    # -------------------------------------------------------------
+    # 1. Load UW visual field data:
+    
     vf_path = data_dir / "UW_VF_Data.csv"
 
     vf_df = pd.read_csv(vf_path)
     print("VF data shape:", vf_df.shape)
     print("Columns:", vf_df.columns)
 
-    # -------------------------------------------------------------
     # 2. Build per-eye baseline table
     #    Use PatID + Eye as unique eye identifier
     #    Baseline = earliest Time_from_Baseline per eye
-    # -------------------------------------------------------------
+
+    
     vf_df["EyeID"] = vf_df["PatID"].astype(str) + "_" + vf_df["Eye"].astype(str)
 
     baseline_vf = (
@@ -47,56 +42,61 @@ def main():
 
     print("Baseline VF shape:", baseline_vf.shape)
 
-    # For convenience, call this merged
+    # For convenience, call this merged:
+    
     merged = baseline_vf.copy()
     print("Merged shape:", merged.shape)
 
-    # -------------------------------------------------------------
     # 3. Feature selection
-    # -------------------------------------------------------------
     # Basic features
+
+    
     basic_features = ["MS", "Age", "Time_from_Baseline"]
 
-    # Pattern deviation features (PD_45 ... PD_54, etc.)
+    # Pattern deviation features (PD_45 ... PD_54, etc.):
+    
     pd_features = [c for c in merged.columns if c.startswith("PD_")]
 
-    # MS cluster features
+    # (Mean Sensitivity) MS cluster features:
+    
     cluster_features = [c for c in merged.columns if c.startswith("MS_Cluster")]
 
     feature_cols = basic_features + pd_features + cluster_features
 
     print("Using", len(feature_cols), "features.")
 
-    # -------------------------------------------------------------
     # 4. Build model dataframe (only require target to be present)
     #    Use MS (mean sensitivity) as regression target
-    # -------------------------------------------------------------
+
+    
     target_col = "MS"
 
-    # Keep rows where target is not NaN
+    # Keep rows where target is not NaN:
+    
     mask = merged[target_col].notna()
     y = merged.loc[mask, target_col].values
 
-    # Take features for those rows and fill missing values
+    # Take features for those rows and fill missing values:
+    
     X_df = merged.loc[mask, feature_cols].copy()
 
-    # Fill NaNs in features with column means
+    # Fill NaNs in features with column means:
+    
     X_df = X_df.fillna(X_df.mean(numeric_only=True))
 
     X = X_df.values
 
     print("Model dataframe shape:", X_df.shape)
 
-    # -------------------------------------------------------------
-    # 5. Train/test split
-    # -------------------------------------------------------------
+    
+    # 5. Train/test split:
+    
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
 
-    # -------------------------------------------------------------
-    # 6. Train Random Forest
-    # -------------------------------------------------------------
+    # 6. Train Random Forest:
+    
     rf = RandomForestRegressor(
         n_estimators=200,
         min_samples_leaf=3,
@@ -107,9 +107,9 @@ def main():
     rf.fit(X_train, y_train)
     y_pred = rf.predict(X_test)
 
-    # -------------------------------------------------------------
-    # 7. Evaluation
-    # -------------------------------------------------------------
+    
+    # 7. Evaluation:
+    
     mae = mean_absolute_error(y_test, y_pred)
     mse = mean_squared_error(y_test, y_pred)
     rmse = np.sqrt(mse)
@@ -119,7 +119,9 @@ def main():
     print(f"RMSE: {rmse:.4f}")
     print(f"R^2: {r2:.4f}")
 
-    # Save results into the RandomForestRegressor folder
+    # Save results into the RandomForestRegressor folder: 
+
+    
     results_path = rfr_dir / "RFR_results.txt"
     with results_path.open("w") as f:
         f.write("RandomForestRegressor – UW dataset\n")
@@ -130,11 +132,10 @@ def main():
 
     print(f"Saved metrics to {results_path}")
 
-    # -------------------------------------------------------------
-    # 8. Feature importance plot
-    # -------------------------------------------------------------
+    # 8. Feature importance plot:
+    
     importances = rf.feature_importances_
-    idx = np.argsort(importances)[::-1][:15]  # top 15
+    idx = np.argsort(importances)[::-1][:15]  
 
     plt.figure(figsize=(8, 6))
     plt.bar(range(len(idx)), importances[idx])
