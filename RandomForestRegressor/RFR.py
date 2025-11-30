@@ -13,19 +13,21 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 def main():
     this_file = Path(__file__).resolve()
-    project_root = this_file.parents[1]       
+    project_root = this_file.parents[1]
     data_dir = project_root / "data"
     rfr_dir = project_root / "RandomForestRegressor"
 
-    # 1. Load UW visual field data:
-    
-    vf_path = data_dir / "UW_VF_Data.csv"
+
+    # 1. Load UW visual field data
+
+        vf_path = data_dir / "UW_VF_Data.csv"
 
     vf_df = pd.read_csv(vf_path)
     print("VF data shape:", vf_df.shape)
     print("Columns:", vf_df.columns)
 
-    # 2. Build per-eye baseline table
+
+        # 2. Build per-eye baseline table
     #    Use PatID + Eye as unique eye identifier
     #    Baseline = earliest Time_from_Baseline per eye
 
@@ -40,24 +42,20 @@ def main():
         .reset_index()
     )
 
-    print("Baseline VF shape:", baseline_vf.shape)
-
-    # For convenience, call this merged:
-    
+    print("Baseline VF shape:", baseline_vf.shape)    
     merged = baseline_vf.copy()
     print("Merged shape:", merged.shape)
 
     # 3. Feature selection
     # Basic features
-
     
     basic_features = ["MS", "Age", "Time_from_Baseline"]
 
-    # Pattern deviation features (PD_45 ... PD_54, etc.):
+    # Pattern deviation features (PD_45 ... PD_54, etc.)
     
     pd_features = [c for c in merged.columns if c.startswith("PD_")]
 
-    # (Mean Sensitivity) MS cluster features:
+    # (Mean Sensitivity) MS cluster features
     
     cluster_features = [c for c in merged.columns if c.startswith("MS_Cluster")]
 
@@ -67,7 +65,6 @@ def main():
 
     # 4. Build model dataframe (only require target to be present)
     #    Use MS (mean sensitivity) as regression target
-
     
     target_col = "MS"
 
@@ -88,7 +85,6 @@ def main():
 
     print("Model dataframe shape:", X_df.shape)
 
-    
     # 5. Train/test split:
     
     X_train, X_test, y_train, y_test = train_test_split(
@@ -107,7 +103,6 @@ def main():
     rf.fit(X_train, y_train)
     y_pred = rf.predict(X_test)
 
-    
     # 7. Evaluation:
     
     mae = mean_absolute_error(y_test, y_pred)
@@ -119,8 +114,7 @@ def main():
     print(f"RMSE: {rmse:.4f}")
     print(f"R^2: {r2:.4f}")
 
-    # Save results into the RandomForestRegressor folder: 
-
+    # Save results into the RandomForestRegressor folder:
     
     results_path = rfr_dir / "RFR_results.txt"
     with results_path.open("w") as f:
@@ -132,10 +126,10 @@ def main():
 
     print(f"Saved metrics to {results_path}")
 
-    # 8. Feature importance plot:
+    # 8. Feature importance bar plot
     
     importances = rf.feature_importances_
-    idx = np.argsort(importances)[::-1][:15]  
+    idx = np.argsort(importances)[::-1][:15]  # top 15
 
     plt.figure(figsize=(8, 6))
     plt.bar(range(len(idx)), importances[idx])
@@ -154,6 +148,40 @@ def main():
     plt.close()
 
     print(f"Saved feature importance plot to {fig_path}")
+
+    # 9. PD-feature importance heatmap
+    # Map importances to feature names
+    
+    fi_series = pd.Series(importances, index=feature_cols)
+
+    # Keep only PD_* features
+    pd_importances = fi_series[pd_features]
+
+    if len(pd_importances) > 0:
+        plt.figure(figsize=(8, 2))
+        # 1 x N heatmap of PD feature importances
+        plt.imshow(
+            pd_importances.values.reshape(1, -1),
+            aspect="auto"
+        )
+        plt.colorbar(label="Importance")
+        plt.xticks(
+            range(len(pd_importances)),
+            pd_importances.index,
+            rotation=45,
+            ha="right",
+        )
+        plt.yticks([0], ["PD importance"])
+        plt.title("Random Forest PD Feature Importance Heatmap")
+        plt.tight_layout()
+
+        heat_path = rfr_dir / "RFR_PD_importance_heatmap.png"
+        plt.savefig(heat_path, dpi=300)
+        plt.close()
+
+        print(f"Saved PD importance heatmap to {heat_path}")
+    else:
+        print("No PD_* features found – skipping heatmap.")
 
 
 if __name__ == "__main__":
