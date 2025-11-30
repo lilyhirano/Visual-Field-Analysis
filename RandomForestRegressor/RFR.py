@@ -53,7 +53,7 @@ def main():
     # MS cluster features
     cluster_features = [c for c in merged.columns if c.startswith("MS_Cluster")]
 
-       feature_cols = basic_features + pd_features + cluster_features
+    feature_cols = basic_features + pd_features + cluster_features
 
     print("Using", len(feature_cols), "features.")
 
