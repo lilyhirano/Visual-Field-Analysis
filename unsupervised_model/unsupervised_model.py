@@ -6,9 +6,7 @@ from sklearn.cluster import KMeans
 from umap import UMAP
 import matplotlib.pyplot as plt
 from sklearn.metrics import calinski_harabasz_score, silhouette_score
-
-
-data = pd.read_pickle('./pkl_data/GRAPE.pkl')
+# from scipy.interpolate import Rbf
 
 class Unsupervised_Model():
     def __init__(self, data):
@@ -51,7 +49,7 @@ class Unsupervised_Model():
     @staticmethod
     def find_PCA_emb(patients, flat_scaled, valid_rows, n=7):
         N, T, P = patients.shape
-        pca = PCA(n_components=n)
+        pca = PCA(n_components=n, random_state=30)
         pca.fit(valid_rows)
         flat_visits_emb = pca.transform(np.nan_to_num(flat_scaled, nan=0.0)) #make NaN 0.0 to avoid errors
 
@@ -60,7 +58,7 @@ class Unsupervised_Model():
         return visit_emb
 
     @staticmethod
-    def get_features(patients, visit_emb, masks, n):
+    def get_features(visit_emb, masks, n):
         '''
         Current features:
         mean slope - mean slope of vision loss progression per dB point
@@ -78,7 +76,7 @@ class Unsupervised_Model():
 
     @staticmethod
     def kmean_clustering(patient_features, c=4):
-        kmeans = KMeans(n_clusters=c)
+        kmeans = KMeans(n_clusters=c, random_state=30)
         labels = kmeans.fit_predict(patient_features)
 
         return labels
@@ -102,10 +100,10 @@ class Unsupervised_Model():
         c - number of clusters for KMeans
             (default 4)
         '''
-        patients, masks = self.create_VFdata(self.data)
-        flat_scaled, valid_rows = self.scale_VF_data(patients, masks)
-        visit_emb = self.find_PCA_emb(patients, flat_scaled, valid_rows, n)
-        self.patient_features = self.get_features(patients, visit_emb, masks, n)
+        self.patients, self.masks = self.create_VFdata(self.data)
+        flat_scaled, valid_rows = self.scale_VF_data(self.patients, self.masks)
+        visit_emb = self.find_PCA_emb(self.patients, flat_scaled, valid_rows, n)
+        self.patient_features = self.get_features(visit_emb, self.masks, n)
         self.labels = self.kmean_clustering(self.patient_features, c)
         
     def make_visual(self):
@@ -124,14 +122,6 @@ class Unsupervised_Model():
         print("Silhouette Score:", score)
         score2 = calinski_harabasz_score(self.patient_features, self.labels)
         print("CH Index:", score2)
-
-    def analyze(self):
-        pass
-
-
-um = Unsupervised_Model(data)
-um.train()
-um.make_visual()
 
 
 
