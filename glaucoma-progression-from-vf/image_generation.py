@@ -9,11 +9,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from PIL import Image
 
-# --- paths (keep the old CSV path) ---
-DATA_PATH = "data/uw_vf.csv"      # UW VF dataset (CSV)
-OUT_DIR = "Results/Images"        # where we will save PNG heatmaps
+# Data paths (keep the old CSV path) 
+DATA_PATH = "data/uw_vf.csv"      
+OUT_DIR = "Results/Images"        
 
-# --- grid layout (Humphrey 24-2 has 54 test points) ---
+# grid layout (Humphrey 24-2 has 54 test points) 
 GRID_ROWS = 6
 GRID_COLS = 9
 
@@ -45,11 +45,11 @@ def save_vf_image(row: pd.Series, cols: list[str], out_path: str, cmap: str = "v
     cmap : str
         Matplotlib colormap name.
     """
-    # extract PD_* values in a fixed order
     values = row[cols].values
     grid = values_to_grid(values)
 
-    # simple heatmap plot
+    # simple heatmap plot:
+    
     plt.figure(figsize=(3, 2.5))
     plt.imshow(grid, origin="lower", cmap=cmap)
     plt.axis("off")
@@ -64,7 +64,6 @@ def quick_gallery() -> None:
 
     This just helps confirm that the heatmaps look reasonable.
     """
-    # grab the first few PNG files we find
     paths = sorted(glob(os.path.join(OUT_DIR, "*.png")))[:6]
     if not paths:
         print("No images found in", OUT_DIR)
