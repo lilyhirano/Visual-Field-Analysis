@@ -48,8 +48,52 @@ Runs the severity + progression models
 
 Displays:
 
+
 Current loss estimate
 
 Expected progression trend
 
 Optional predicted future VF heatmap
+
+# Repository Structure
+
+glaucoma-progression-from-vf/
+
+data/
+
+notebooks/
+
+data_exploration.ipynb
+
+image_generation.ipynb
+
+severity_model.ipynb
+
+progression_model.ipynb
+
+gui_demo.ipynb
+
+models/
+
+cnn_severity.py
+
+slope_regressor.py
+
+utils.py
+
+visualization/
+
+vf_plotting.py
+
+gui/
+
+app.py   
+
+requirements.txt
+
+README.md
+
+README_DATA.md
+
+
+
