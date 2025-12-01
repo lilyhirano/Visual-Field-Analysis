@@ -1,168 +1,162 @@
-# Predicting Glaucoma Severity and Progression from Humphrey Visual Field (VF) Data
-## Contributors: David Houshangi, Lily Hirano, Kirk Ehmsen, Yash Maheshwaran, Christian Fernandez
+Visual Field Analysis: Glaucoma Progression & Severity Modeling
+ 
+# Overview
 
-This project explores whether deep learning and classical machine-learning models can detect visual field damage and predict future progression of glaucoma using the UW Humphrey Visual Field (UWHVF) dataset. The dataset contains thousands of real clinical 24-2 visual field tests collected longitudinally across many patients. Each VF test includes numerical sensitivity values at 54 test points, global indices (MTD, PSD, MS), patient attributes, and follow-up time.
+This project analyzes visual field (VF) test data from glaucoma patients and builds two predictive models:
 
-The goal of this project is to transform these VF measurements into 2D images, train models to recognize glaucomatous patterns, and forecast the likely rate of visual field loss over time. In the long term, this pipeline will support a simple GUI where users can upload a VF image and receive both a severity estimate and a predicted progression rate.
+A progression model – predicts how fast a patient’s visual field will decline.
 
-# Project Objectives
-> 1. Predict current visual field damage from a VF image
+A severity model – classifies the current stage of visual field loss from a VF heatmap.
 
-Convert the 54 TD/PD/Sensitivity points into a 2D heatmap.
+The project also generates visual heatmaps of the visual field, cleans and organizes the dataset, and supports a simple GUI tool for running the models interactively.
 
-Train models to estimate severity using global indices such as:
+# Dataset
 
-Mean Total Deviation (MTD)
+The primary dataset is derived from the University of Washington Visual Field (UW VF) database.
+Each row represents one VF test and includes:
+
+54 threshold deviation (TD) and pattern deviation (PD) values
 
 Mean Sensitivity (MS)
 
-Pattern Standard Deviation (PSD)
+Follow-up test dates
 
-Possible outputs:
+Global indices like MD and PSD
 
-Continuous regression (e.g., predicted MTD)
+We focus on PD values because they highlight localized defects used clinically to detect glaucomatous damage.
 
-Classification (normal / mild / moderate / severe)
+# Data Cleaning
 
-> 2. Predict future glaucoma progression
+data_cleaning.py prepares the raw dataset:
 
-Using longitudinal VF tests per eye, compute: MTD_slope = 𝑑(𝑀𝑇𝐷) / 𝑑t
+Steps:
 
-This slope (dB/year) serves as the progression label.
+Load the raw CSV containing all VF tests.
 
-Models will then be trained to:
+Remove entries with missing MS_slope (the progression ground truth).
 
-Predict slope from early VFs (baseline or first few tests)
+Compute MS_mean for severity classification.
 
-Identify fast vs slow progressors
+Drop unused or fully missing columns.
 
-Learn temporal patterns of deterioration
+Save a clean dataset (data/uw_vf_clean.csv) with consistent shape.
 
-> 3. Build a prototype GUI
+Final cleaned dataset size: ≈28,000 rows × 186 columns
 
-A lightweight tool (Streamlit or PyQt) that:
+# Visual Field Heatmap Generation
 
-Accepts a VF image upload
+image_generation.py converts the 54 PD values into simple 6×9 2D grids and saves them as images.
 
-Runs the severity + progression models
+Why 6×9?
 
-Displays:
+Clinical visual field tests record 54 locations arranged in an irregular pattern—commonly mapped to a 6×9 grid for visualization.
 
+Output:
 
-Current loss estimate
+PNG heatmaps saved in Results/Images/
 
-Expected progression trend
+Useful for:
 
-Optional predicted future VF heatmap
+CNN input
 
-# Notebooks Overview
+Visual inspection
 
-| Notebook | Description |
-|---------|-------------|
-| `data_exploration.py` | Load the UW VF dataset, inspect variables, analyze MS, MTD, TD, PD distributions. |
-| `image_generation.py` | Convert Sens / PD / TD values into 2D VF heatmaps using interpolation. |
-| `severity_model.py` | Train CNN to predict MS severity or classify severity categories. |
-| `progression_model.py` | Build regression model to estimate MS slope (glaucoma progression). |
-| `gui.py` | Prototype of GUI for uploading VF and predicting severity + progression. |
+Presentations and demos
 
-# Dataset Overview (UWHVF)
+You generated 25–200 images depending on the test runs.
 
-Each row in the dataset represents one VF exam for one eye at one time point. Key fields include:
+# Progression Model (Random Forest)
 
-PatID: patient identifier
+progression_model.py predicts the rate of decline of visual field function.
 
-Eye: left/right
+Target variable:
 
-FieldN: exam number (1st, 2nd, …)
+MS_slope (dB/year) → how quickly the eye loses sensitivity.
 
-Age: age at exam
+Features used:
 
-Time_from_Baseline: years since first exam
+PD values
 
-Global indices:
+Global indices
 
-MS, MTD, PSD, cluster measures
+Learnable non-linear interactions
 
-54 point-wise measures:
+Model:
 
-Sens_1 … Sens_54
+RandomForestRegressor
 
-TD_1 … TD_54
+Train/test split = 75% / 25%
 
-PD_1 … PD_54
+Output metric: Mean Squared Error (MSE)
 
-The presence of multiple tests per eye makes it ideal for forecasting progression.
+Example performance:
+Test MSE ≈ 3782.9
 
-# Methods
 
-1. VF Image Construction
+This is expected because regression on noisy clinical VF slopes is challenging.
+Still, the model captures broad trends in progression.
 
-Use 54 fixed (x,y) coordinates of HFA 24-2 grid
+Output:
 
-Interpolate to a smooth 2D heatmap
+A trained model saved locally as:
 
-Normalize intensity values
+Results/progression_model.pkl
 
-Create 224×224 grayscale images suitable for CNN models
 
-2. Severity Modeling
+(Not stored in the GitHub repo because it exceeds 100 MB.)
 
-Baseline models:
+# Severity Classification Model (CNN)
 
-Random Forest Regressor (predict MTD)
+severity_model.py predicts mild vs moderate vs severe glaucoma using PD heatmaps.
 
-Linear/Logistic Regression
+Labels (3-class severity):
 
-XGBoost
+Based on Mean Sensitivity (MS_mean):
 
-Deep models:
+0 = Mild
 
-Simple CNN for VF images
+1 = Moderate
 
-CNN + dense layers for severity classification/regression
+2 = Severe
 
-3. Progression Modeling
+Input:
 
-Compute per-eye MTD_slope using linear regression
+PD values reshaped into (6, 9, 1) image-like tensors
 
-Predict slope from:
+CNN Architecture:
 
-first VF
+2 convolution layers
 
-early VF sequence
+MaxPooling
 
-VF images
+Dense classification head
 
-patient age / PSD / MS
+Softmax output
 
-Advanced:
+Training results (your run):
+Accuracy ≈ 65.3%
 
-CNN encoder → LSTM for sequence prediction
 
-U-Net-style decoder to generate future VF maps
+Considering the simplicity of the CNN and noisy clinical data, this is a reasonable baseline.
 
-# Results
+Output:
 
-Add here
+A trained model saved locally:
 
-# Future Features
+Results/severity_model.h5
 
-Multi-modal fusion (fundus + VF)
+# GUI (Interactive Model Demo)
 
-Automated reliability index estimation
+gui.py provides a simple interactive interface to:
 
-Individualized prediction intervals
+Load a patient’s VF record
 
-Uncertainty estimation (MC dropout or deep ensembles)
+Display the 6×9 PD heatmap
 
-# Setup
-```bash
-git clone https://github.com/<your-username>/glaucoma-progression-from-vf
-cd glaucoma-progression-from-vf
-pip install -r requirements.txt
+Run:
 
-```
+Severity prediction via CNN
 
-# Citation 
+Progression prediction via Random Forest
 
-UWHVF: A Real-World, Open Source Dataset of Perimetry Tests From the Humphrey Field Analyzer
+Useful for classroom demonstrations or clinician-facing prototypes.
