@@ -61,11 +61,11 @@ Optional predicted future VF heatmap
 
 | Notebook | Description |
 |---------|-------------|
-| `01_data_exploration.ipynb` | Load the UW VF dataset, inspect variables, analyze MS, MTD, TD, PD distributions. |
-| `02_image_generation.ipynb` | Convert Sens / PD / TD values into 2D VF heatmaps using interpolation. |
-| `03_severity_model.ipynb` | Train CNN to predict MS severity or classify severity categories. |
-| `04_progression_model.ipynb` | Build regression model to estimate MS slope (glaucoma progression). |
-| `05_gui_demo.ipynb` | Prototype of GUI for uploading VF and predicting severity + progression. |
+| `data_exploration.ipynb` | Load the UW VF dataset, inspect variables, analyze MS, MTD, TD, PD distributions. |
+| `image_generation.ipynb` | Convert Sens / PD / TD values into 2D VF heatmaps using interpolation. |
+| `severity_model.ipynb` | Train CNN to predict MS severity or classify severity categories. |
+| `progression_model.ipynb` | Build regression model to estimate MS slope (glaucoma progression). |
+| `gui_demo.ipynb` | Prototype of GUI for uploading VF and predicting severity + progression. |
 
 glaucoma-progression-from-vf/
 
