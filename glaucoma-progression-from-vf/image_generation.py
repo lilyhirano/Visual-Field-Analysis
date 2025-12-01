@@ -1,88 +1,72 @@
-# image generation 
-
-"""
-image_generation.py
-
-Convert VF numeric values (Sens / TD / PD) into simple 2D heatmaps.
-
-Right now:
-- assumes 54 locations -> reshaped into a 6x9 grid
-- saves PD maps as PNG images for the first N rows
-"""
+# image generator 
 
 import os
-from glob import glob
-
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from PIL import Image
 
-DATA_PATH = "data/uw_vf.csv"
-OUT_DIR = "data/vf_images"
+DATA_PATH = "Data/UW_VF_Data.csv"        
+OUT_DIR = "Results/Images"               #
 
 GRID_ROWS = 6
 GRID_COLS = 9
 
 
-def values_to_grid(values_1d):
-    """Reshape 54-length vector into a (6, 9) grid."""
-    values_1d = np.asarray(values_1d)
-    assert len(values_1d) == GRID_ROWS * GRID_COLS
-    return values_1d.reshape(GRID_ROWS, GRID_COLS)
+def values_to_grid(values):
+    """Convert raw PD values into a 6 × 9 grid."""
+    arr = pd.to_numeric(values, errors="coerce").fillna(0).astype(float)
+    return arr.values.reshape(GRID_ROWS, GRID_COLS)
 
 
-def save_vf_image(row, cols, out_path, cmap="viridis"):
-    """Save a heatmap for the given row and column set."""
-    grid = values_to_grid(row[cols].values)
+def normalize_grid(grid):
+    """Scale values between 0–255 for grayscale heatmap."""
+    g = grid.copy()
+    mn, mx = g.min(), g.max()
 
-    plt.figure(figsize=(3, 2.5))
-    plt.imshow(grid, origin="lower", cmap=cmap)
-    plt.axis("off")
-    plt.tight_layout()
-    plt.savefig(out_path, dpi=120, bbox_inches="tight")
-    plt.close()
+    if mx - mn < 1e-6:
+        return np.zeros_like(g, dtype=np.uint8)
 
-
-def quick_gallery():
-    """Show a few saved images as a small sanity check."""
-    paths = sorted(glob(os.path.join(OUT_DIR, "vf_*.png")))[:6]
-    if not paths:
-        print("No images found in", OUT_DIR)
-        return
-
-    plt.figure(figsize=(10, 4))
-    for j, p in enumerate(paths):
-        img = Image.open(p)
-        plt.subplot(2, 3, j + 1)
-        plt.imshow(img)
-        plt.axis("off")
-        plt.title(os.path.basename(p))
-    plt.tight_layout()
-    plt.show()
+    g = (g - mn) / (mx - mn)
+    return (g * 255).astype(np.uint8)
 
 
-def main(n_examples: int = 200):
-    if not os.path.exists(DATA_PATH):
-        raise FileNotFoundError(f"Could not find dataset at {DATA_PATH}")
+def grid_to_color_image(grid):
+    """Convert grayscale grid into RGB heatmap using a simple colormap."""
+    # grayscale → color
+    h, w = grid.shape
+    rgb = np.zeros((h, w, 3), dtype=np.uint8)
+
+    # simple VF-style colormap: blue → green → yellow → red
+    rgb[:, :, 0] = np.clip(grid * 1.5, 0, 255)        # R
+    rgb[:, :, 1] = np.clip(255 - grid, 0, 255)        # G
+    rgb[:, :, 2] = np.clip(grid * 0.8, 0, 255)        # B
+
+    return Image.fromarray(rgb, mode="RGB").resize((256, 256), Image.NEAREST)
+
+
+def main(n_examples=200):
+
+    print("Loading dataset...")
+    df = pd.read_csv(DATA_PATH)
+
+    pd_cols = [c for c in df.columns if c.startswith("PD_")]
+    print("PD columns detected:", len(pd_cols))
 
     os.makedirs(OUT_DIR, exist_ok=True)
 
-    vf = pd.read_csv(DATA_PATH)
-    pd_cols = [c for c in vf.columns if c.startswith("PD_")]
-    print("Number of PD columns:", len(pd_cols))
+    print(f"Generating {n_examples} fast images…")
 
-    subset = vf.head(n_examples)
+    subset = df.head(n_examples)
 
-    for idx, (i, r) in enumerate(subset.iterrows()):
-        filename = f"vf_{i}_PD.png"
-        path = os.path.join(OUT_DIR, filename)
-        save_vf_image(r, pd_cols, path)
+    for idx, row in subset.iterrows():
+        grid = values_to_grid(row[pd_cols])
+        norm = normalize_grid(grid)
+        img = grid_to_color_image(norm)
 
-    print(f"Saved {len(subset)} PD VF images to {OUT_DIR}")
+        out_path = os.path.join(OUT_DIR, f"vf_{idx}_PD.png")
+        img.save(out_path)
 
-    # showing a few examples
-    quick_gallery()
+    print(f"Done! Saved {n_examples} images → {OUT_DIR}")
 
 
 if __name__ == "__main__":
