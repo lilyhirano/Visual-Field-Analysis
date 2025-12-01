@@ -65,47 +65,6 @@ Optional predicted future VF heatmap
 | `progression_model.py` | Build regression model to estimate MS slope (glaucoma progression). |
 | `gui.py` | Prototype of GUI for uploading VF and predicting severity + progression. |
 
-# Repository Structure
-
-glaucoma-progression-from-vf/
-
-data/
-
-notebooks/
-
-data_exploration.ipynb
-
-image_generation.ipynb
-
-severity_model.ipynb
-
-progression_model.ipynb
-
-gui_demo.ipynb
-
-models/
-
-cnn_severity.py
-
-slope_regressor.py
-
-utils.py
-
-visualization/
-
-vf_plotting.py
-
-gui/
-
-app.py   
-
-requirements.txt
-
-README.md
-
-README_DATA.md
-
-
 # Dataset Overview (UWHVF)
 
 Each row in the dataset represents one VF exam for one eye at one time point. Key fields include:
