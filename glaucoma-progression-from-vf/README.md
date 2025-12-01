@@ -55,9 +55,7 @@ Expected progression trend
 
 Optional predicted future VF heatmap
 
-# Repository Structure
-
-## Notebooks Overview
+# Notebooks Overview
 
 | Notebook | Description |
 |---------|-------------|
@@ -66,6 +64,8 @@ Optional predicted future VF heatmap
 | `severity_model.py` | Train CNN to predict MS severity or classify severity categories. |
 | `progression_model.py` | Build regression model to estimate MS slope (glaucoma progression). |
 | `gui.py` | Prototype of GUI for uploading VF and predicting severity + progression. |
+
+# Repository Structure
 
 glaucoma-progression-from-vf/
 
