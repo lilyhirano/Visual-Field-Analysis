@@ -96,4 +96,104 @@ README.md
 README_DATA.md
 
 
+# Dataset Overview (UWHVF)
 
+Each row in the dataset represents one VF exam for one eye at one time point. Key fields include:
+
+PatID: patient identifier
+
+Eye: left/right
+
+FieldN: exam number (1st, 2nd, …)
+
+Age: age at exam
+
+Time_from_Baseline: years since first exam
+
+Global indices:
+
+MS, MTD, PSD, cluster measures
+
+54 point-wise measures:
+
+Sens_1 … Sens_54
+
+TD_1 … TD_54
+
+PD_1 … PD_54
+
+The presence of multiple tests per eye makes it ideal for forecasting progression.
+
+# Methods
+
+1. VF Image Construction
+
+Use 54 fixed (x,y) coordinates of HFA 24-2 grid
+
+Interpolate to a smooth 2D heatmap
+
+Normalize intensity values
+
+Create 224×224 grayscale images suitable for CNN models
+
+2. Severity Modeling
+
+Baseline models:
+
+Random Forest Regressor (predict MTD)
+
+Linear/Logistic Regression
+
+XGBoost
+
+Deep models:
+
+Simple CNN for VF images
+
+CNN + dense layers for severity classification/regression
+
+3. Progression Modeling
+
+Compute per-eye MTD_slope using linear regression
+
+Predict slope from:
+
+first VF
+
+early VF sequence
+
+VF images
+
+patient age / PSD / MS
+
+Advanced:
+
+CNN encoder → LSTM for sequence prediction
+
+U-Net-style decoder to generate future VF maps
+
+# Results
+
+Add here
+
+# Future Features
+
+Multi-modal fusion (fundus + VF)
+
+Automated reliability index estimation
+
+Individualized prediction intervals
+
+Uncertainty estimation (MC dropout or deep ensembles)
+
+# Setup
+```bash
+git clone https://github.com/<your-username>/glaucoma-progression-from-vf
+cd glaucoma-progression-from-vf
+pip install -r requirements.txt
+
+```
+
+# Citation 
+
+UWHVF: A Real-World, Open Source Dataset of Perimetry Tests From the Humphrey Field Analyzer
