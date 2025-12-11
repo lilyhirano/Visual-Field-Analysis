@@ -13,12 +13,15 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.impute import SimpleImputer
+
 from sklearn.metrics import (
+    
     mean_absolute_error,
     mean_squared_error,
     r2_score,
     confusion_matrix,
     classification_report,
+
 )
 
 sns.set(style="whitegrid")
@@ -177,7 +180,8 @@ print("Number of features:", len(feature_cols))
 
 mask_2plus = reg_df["n_visits"] >= 7
 reg_df_2 = reg_df[mask_2plus].copy()
-print(f"Eyes with ≥9 visits: {reg_df_2.shape[0]} (out of {reg_df.shape[0]})")
+
+print(f"Eyes with ≥ 7 visits: {reg_df_2.shape[0]} (out of {reg_df.shape[0]})")
 
 available_features = [f for f in feature_cols if f in reg_df_2.columns]
 missing_features = [f for f in feature_cols if f not in reg_df_2.columns]
