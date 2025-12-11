@@ -47,13 +47,25 @@ class Analyzer():
         
         return image
     
-    def _plot_interp_feature(self, feature, cmap = 'viridis', title = '', use_vminmax = True):
+    def _plot_interp_feature(self, feature, cmap = 'viridis', title = '', use_vminmax = 1):
         '''
         Plots a series of VFs.
+        use_vminmax : choose from three options
+            0 - create one colorbar based on vmin = 0 and vmax = 35 (Octopus dB range)
+            1 - create one colorbar based on vmin and vmax of clusters
+            2 - create many colorbars on individual scales
         '''
         fig, axes = plt.subplots(1, self.n_clusters, figsize=(4*self.n_clusters, 5))
 
-        if use_vminmax: #If want one colorbar on same scale 
+        if use_vminmax == 0: #If want one colorbar on range 0 to 35
+            for ax, c in zip(axes, self.clusters):
+                values = feature[c]
+                im = self._plot_interpolated_vf(values, ax=ax,
+                                        cmap=cmap, title=c, vmin=0, vmax=35)
+                
+            fig.colorbar(im, ax=axes.ravel().tolist(), shrink=0.6)
+
+        elif use_vminmax == 1: #If want one colorbar on same scale 
             all_vals = np.concatenate([feature[c] for c in self.clusters])
             vmin, vmax = all_vals.min(), all_vals.max()
             for ax, c in zip(axes, self.clusters):
@@ -62,16 +74,17 @@ class Analyzer():
                                         cmap=cmap, title=c, vmin=vmin, vmax=vmax)
 
             fig.colorbar(im, ax=axes.ravel().tolist(), shrink=0.6)
-            fig.suptitle(title, fontsize=25)
-        else: #If want many colorbars on individual scales
+            
+        elif use_vminmax == 2: #If want many colorbars on individual scales
             for ax, c in zip(axes, self.clusters):
                 values = feature[c]
                 im = self._plot_interpolated_vf(values, ax=ax,
                                         cmap=cmap, title=c, vmin=None, vmax=None)
-                fig.colorbar(im, ax=ax, shrink=0.6)  
+                fig.colorbar(im, ax=ax, shrink=0.6)
 
-            fig.suptitle(title, fontsize=25)
-
+        else: raise ValueError(f"use_vminmax must be 0, 1, or 2. Got {use_vminmax}")
+        
+        fig.suptitle(title, fontsize=25)
         return plt
 
     def show_label_distribution(self):
@@ -110,7 +123,7 @@ class Analyzer():
         self.baseline_means = {c: np.nanmean(self.patients[idx, 0, :], axis=0)
                           for c, idx in self.clusters.items()}
         
-        plot = self._plot_interp_feature(self.baseline_means, cmap='viridis', title = 'Mean Baseline VF per Cluster')
+        plot = self._plot_interp_feature(self.baseline_means, cmap='viridis', title = 'Mean Baseline VF per Cluster', use_vminmax=0)
         plot.savefig('unsupervised_model/mean_baseline.png')
 
     def _last_visit_per_patient(self):
@@ -134,7 +147,7 @@ class Analyzer():
         self.last_means = {c: np.nanmean(last_visits[idx], axis=0)
                            for c, idx in self.clusters.items()}
         
-        plot = self._plot_interp_feature(self.last_means, cmap='viridis', title = 'Mean Final VF per Cluster')
+        plot = self._plot_interp_feature(self.last_means, cmap='viridis', title = 'Mean Final VF per Cluster', use_vminmax=0)
         plot.savefig('unsupervised_model/mean_final.png')
 
     def show_mean_change(self):
@@ -144,7 +157,7 @@ class Analyzer():
         '''
         self.diff_means = {c: self.last_means[c]- self.baseline_means[c] for c in self.clusters.keys()}
     
-        plot = self._plot_interp_feature(self.diff_means, cmap='coolwarm_r', title = 'Mean Change in VF by Cluster', use_vminmax=True)
+        plot = self._plot_interp_feature(self.diff_means, cmap='coolwarm_r', title = 'Mean Change in VF by Cluster', use_vminmax=1)
         plot.savefig('unsupervised_model/mean_change.png')
 
     def show_mean_change_per_cluster(self):
@@ -152,7 +165,7 @@ class Analyzer():
         Interpolated VFs for the mean change in each cluster
         On individual color scale
         '''
-        plot = self._plot_interp_feature(self.diff_means, cmap='coolwarm_r', title = 'Mean Change in VF Within Each Cluster', use_vminmax=False)
+        plot = self._plot_interp_feature(self.diff_means, cmap='coolwarm_r', title = 'Mean Change in VF Within Each Cluster', use_vminmax=2)
         plot.savefig('unsupervised_model/mean_change_individual.png')
 
     def run_all(self):
