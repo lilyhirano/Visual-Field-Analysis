@@ -3,6 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class Analyzer():
+    '''
+    Analyzes the clusters of visual fields
+    Saves images to the unsupervised_model folder
+    '''
     def __init__(self, labels, patients, masks, coords):
         self.coords = coords
         self.patients = patients
@@ -18,6 +22,8 @@ class Analyzer():
 
     def _plot_interpolated_vf(self, values, ax=None, cmap='viridis', title=None, vmin=None, vmax=None):
         """
+        Plots one VF
+
         values: (60,) vector
         ax: matplotlib axis
         """
@@ -42,25 +48,26 @@ class Analyzer():
         return image
     
     def _plot_interp_feature(self, feature, cmap = 'viridis', title = '', use_vminmax = True):
+        '''
+        Plots a series of VFs.
+        '''
         fig, axes = plt.subplots(1, self.n_clusters, figsize=(4*self.n_clusters, 5))
 
-        if use_vminmax:
+        if use_vminmax: #If want one colorbar on same scale 
             all_vals = np.concatenate([feature[c] for c in self.clusters])
             vmin, vmax = all_vals.min(), all_vals.max()
             for ax, c in zip(axes, self.clusters):
                 values = feature[c]
                 im = self._plot_interpolated_vf(values, ax=ax,
-                                        cmap=cmap, title=f"Cluster {c}", vmin=vmin, vmax=vmax)
+                                        cmap=cmap, title=c, vmin=vmin, vmax=vmax)
 
             fig.colorbar(im, ax=axes.ravel().tolist(), shrink=0.6)
             fig.suptitle(title, fontsize=25)
-        else:
-            all_vals = np.concatenate([feature[c] for c in self.clusters])
-            vmin, vmax = all_vals.min(), all_vals.max()
+        else: #If want many colorbars on individual scales
             for ax, c in zip(axes, self.clusters):
                 values = feature[c]
                 im = self._plot_interpolated_vf(values, ax=ax,
-                                        cmap=cmap, title=f"Cluster {c}", vmin=None, vmax=None)
+                                        cmap=cmap, title=c, vmin=None, vmax=None)
                 fig.colorbar(im, ax=ax, shrink=0.6)  
 
             fig.suptitle(title, fontsize=25)
@@ -68,6 +75,9 @@ class Analyzer():
         return plt
 
     def show_label_distribution(self):
+        '''
+        Bar plot of the label distributions
+        '''
         plt.figure(figsize=(6,4))
         plt.bar(self.x_label, self.counts, color='grey')
         plt.xlabel("Cluster")
@@ -77,6 +87,9 @@ class Analyzer():
         plt.savefig('unsupervised_model/label_distribution.png')
 
     def show_visit_distribution(self):
+        '''
+        Bar plot of average number of visits in each cluster
+        '''
         avg_visits = []
         for c in self.x_label:
             i = self.clusters[c]     # compute average visits per cluster
@@ -91,6 +104,9 @@ class Analyzer():
         plt.savefig('unsupervised_model/visit_distribution.png')
 
     def show_mean_baseline(self):
+        '''
+        Interpolated VFs for the mean baseline in each cluster
+        '''
         self.baseline_means = {c: np.nanmean(self.patients[idx, 0, :], axis=0)
                           for c, idx in self.clusters.items()}
         
@@ -98,6 +114,9 @@ class Analyzer():
         plot.savefig('unsupervised_model/mean_baseline.png')
 
     def _last_visit_per_patient(self):
+        '''
+        Finds the last visit for each patient
+        '''
         last_visits = np.full((self.N, self.P), np.nan, dtype=float)
         for i in range(self.N):
             valid_idx = np.where(self.masks[i] == 1)[0]
@@ -107,6 +126,9 @@ class Analyzer():
         return last_visits
 
     def show_mean_final(self):
+        '''
+        Interpolated VFs for the mean final visit in each cluster
+        '''
         last_visits = self._last_visit_per_patient()
 
         self.last_means = {c: np.nanmean(last_visits[idx], axis=0)
@@ -116,12 +138,20 @@ class Analyzer():
         plot.savefig('unsupervised_model/mean_final.png')
 
     def show_mean_change(self):
+        '''
+        Interpolated VFs for the mean change in each cluster
+        On one color scale for direct cluster comparison
+        '''
         self.diff_means = {c: self.last_means[c]- self.baseline_means[c] for c in self.clusters.keys()}
     
         plot = self._plot_interp_feature(self.diff_means, cmap='coolwarm_r', title = 'Mean Change in VF by Cluster', use_vminmax=True)
         plot.savefig('unsupervised_model/mean_change.png')
 
     def show_mean_change_per_cluster(self):
+        '''
+        Interpolated VFs for the mean change in each cluster
+        On individual color scale
+        '''
         plot = self._plot_interp_feature(self.diff_means, cmap='coolwarm_r', title = 'Mean Change in VF Within Each Cluster', use_vminmax=False)
         plot.savefig('unsupervised_model/mean_change_individual.png')
 
