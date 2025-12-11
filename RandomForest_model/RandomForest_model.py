@@ -303,22 +303,34 @@ plt.show()
 # Predicted vs True scatter plot
 
 plt.figure(figsize=(6, 6))
-sc = plt.scatter(
-    y_test, y_pred,
-    c=nvis_test, cmap="viridis",
-    alpha=0.75, edgecolors="black", linewidth=0.4
+plt.scatter(
+    y_test,
+    y_pred,
+    c=nvis_test,
+    cmap="viridis",
+    s=30,
+    alpha=0.7
 )
+
+# perfect prediction line:
+
 min_val = min(y_test.min(), y_pred.min())
 max_val = max(y_test.max(), y_pred.max())
-plt.plot([min_val, max_val], [min_val, max_val],
-         "r--", label="Perfect prediction")
+plt.plot([min_val, max_val], [min_val, max_val], "r--", label="Perfect Prediction Line")
+
+
+# plot labels:
 
 plt.xlabel("Actual MS slope (dB/year)")
 plt.ylabel("Predicted MS slope (dB/year)")
-plt.title(f"Predicted vs Actual MS Slopes (≥ 7 visits)")
-plt.colorbar(sc, label="Number of visits")
+plt.title("Predicted vs Actual MS Slopes (≥ 7 visits)")
+
+
+plt.colorbar(label="Number of visits")
+plt.grid(alpha=0.5)
 plt.legend()
 plt.tight_layout()
+
 plt.show()
 
 
