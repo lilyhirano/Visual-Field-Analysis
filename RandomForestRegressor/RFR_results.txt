@@ -1,5 +1,0 @@
-RandomForestRegressor – UW dataset
-----------------------------------
-MAE:  0.0060
-RMSE: 0.0375
-R^2:  1.0000
