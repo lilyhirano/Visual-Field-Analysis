@@ -1,113 +1,69 @@
-# Chem 277B - Machine Learning Algorithms  
+# Chem 277B — Machine Learning Algorithms
 ## Convolutional Neural Network Analysis of Visual Field Maps for Early Diagnosis and Prediction of Glaucoma Progression
 Team 1 — UC Berkeley, College of Chemistry
 
-Contributors: David Houshangi, Lily Hirano, Kirk Ehmsen, Yash Maheshwaran, Christian Fernandez
+Contributors: David Houshangi, Lily Hirano, Kirk Ehmsen, Christian Fernandez, Yash Maheshwaran
 
-> Subject: Visual-Field-Analysis
+# 1. Project Overview
 
-# 1. Overview
+Glaucoma is a chronic, progressive disease that damages the optic nerve and can lead to irreversible blindness if not detected early. Because early stages often have no symptoms, nearly half of affected individuals do not know they have the disease. Visual field (VF) testing is one of the primary tools for diagnosing glaucoma and tracking its progression, as it measures the patient’s functional vision over time.
 
-Glaucoma is a progressive disease that gradually damages the optic nerve and can lead to permanent blindness if not detected early. Nearly half of affected individuals are unaware they have it because early-stage glaucoma often presents no symptoms. Visual field (VF) testing, which measures functional vision loss, is one of the most important tools for glaucoma diagnosis and monitoring.
+This project explores how modern machine-learning methods, including unsupervised learning, Random Forests, CNNs, and LSTMs can be used to analyze visual field maps, detect patterns of glaucomatous loss, and predict future progression.
 
-This project explores how Convolutional Neural Networks (CNNs) and supervised learning can be applied to:
+We used two major datasets:
 
-- Analyze visual field maps
+1. GRAPE Dataset: 263 eyes, 1,115 longitudinal VF tests
 
-- Identify patterns of glaucomatous vision loss
+2. UW Biomedical AI Dataset: 3,871 patients, 28,943 VF tests
 
-- Cluster progression subtypes
-
-- Predict future deterioration
-
-- Compare disease severity across datasets
-
-We use two major datasets:
-
-- GRAPE Dataset – Longitudinal VF tests (263 eyes, 1,115 follow-ups)
-
-- UW Biomedical AI Dataset – Large-scale VF dataset (3,871 patients, 28,943 tests)
-
-These datasets provide real-world measurements of visual sensitivity, allowing us to examine glaucoma progression through functional vision rather than structural imaging alone.
+Together, these datasets allow us to study glaucoma progression using real functional measurements rather than structural imaging alone.
 
 # 2. Project Goals
 
-Our project focuses on the following objectives:
+## 2.1 Unsupervised Learning
 
-## 2.1 Glaucoma Subtype Discovery
+Cluster visual fields into meaningful glaucoma subtypes based on the spatial pattern and rate of deterioration.
 
-Use unsupervised learning to cluster glaucoma progression patterns based on spatial deterioration of visual fields.
+## 2.2 Random Forest Regression
 
-## 2.2 CNN-Based Vision Loss Classification
+Predict long-term progression (MS slope) from baseline VF features and identify the strongest physiological predictors of decline.
 
-Train CNN models to classify VF maps into disease severity categories using spatial patterns, color maps, and sensitivity distributions.
+## 2.3 CNN-Based VF Classification
 
-## 2.3 Progression Prediction
+Train convolutional neural networks to classify VF maps into severity categories by learning spatial patterns of damage.
 
-Use longitudinal fields from GRAPE to estimate:
+## 2.4 LSTM-Based Progression Modeling
 
-- Rate of vision decline
+Use longitudinal VF sequences to model temporal dynamics and predict how damage evolves over time.
 
-- Risk factors (age, sex, subtype)
+## 2.5 Dataset Alignment
 
-- Likelihood of rapid or slow progression
+Standardize map formats so models trained on UW data can generalize to GRAPE, enabling cross-dataset comparisons.
 
-## 2.4 Dataset Alignment
-
-Standardize VF map formats across the two datasets so that a model trained on one dataset can generalize to the other.
-
-# Repository Structure
-
-Visual-Field-Analysis/
-
-│
-├── data/  
-
-│   ├── grape
-
-│   ├── uw
-
-│   ├── Coord_242.csv
-
-│   └── Add here                   
-│
-├── images/  
-
-│   ├── grape_vf_example.png
-
-│   ├── uw_vf_example.png
-
-│   └── interpolated_vf_maps
-
-│
-├── references 
-
-│   ├── GRAPE_paper.pdf
-
-│   ├── UWHVF_paper.pdf
-
-│   └── bibliography.txt
-
-│
-├── eda_glaucoma_shared.ipynb  
-
-├── grape_images.ipynb      
-
-├── uw_images.ipynb             
-│
-├── Makefile          
-
-├── requirements.txt  
-
-├── README.md                  
-│
-└── .gitignore                  
+# 3. Repository Structure
 
 
-## References
-- GRAPE Dataset
-    - [GRAPE: A multi-modal dataset of longitudinal follow-up visual field and fundus images for glaucoma management](https://www.nature.com/articles/s41597-023-02424-4)
-    - [GRAPE Dataset](https://springernature.figshare.com/collections/GRAPE_A_multi-modal_glaucoma_dataset_of_follow-up_visual_field_and_fundus_images_for_glaucoma_management/6406319/1)
 
-- UWHVF
-    - [UW Biomedical VF GitHub](https://github.com/uw-biomedical-ml/uwhvf)
+
+
+
+# 4. Methods 
+
+- Unsupervised Learning: PCA + KMeans + UMAP for clustering VF progression patterns
+
+- Gradient Boosting:
+
+- Random Forest Regression: Predict slope of MS loss; extract feature importances
+
+- CNN Models: Classify VF severity from interpolated VF maps
+
+- LSTM Models: Sequence-based prediction of future sensitivity loss
+
+
+# 5. References
+
+1. GRAPE Dataset
+Huang et al. GRAPE: A multi-modal dataset of longitudinal follow-up visual fields and fundus images for glaucoma management.
+
+2. UW Biomedical AI Dataset
+Wang et al. A large-scale clinical visual field database for glaucoma analysis.
