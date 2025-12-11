@@ -12,11 +12,9 @@ octopus_coords = np.array([
     (8,8), (8,5), (8,2), (10,-3), (3,-10), (-3,-10), (-10, -2), (-10,2), (-3,10), (3,10), (10,3)
 ])
 
-
-
 data = pd.read_pickle('./pkl_data/GRAPE.pkl')
 grape_model = Unsupervised_Model(data)
-grape_model.train(n=7, c=4)
+grape_model.train(n=1) #n=1 most ideal for silhouette score
 grape_model.make_visual()
 grape_model.metrics()
 

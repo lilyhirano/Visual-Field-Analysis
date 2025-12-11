@@ -79,17 +79,31 @@ class Unsupervised_Model():
         kmeans = KMeans(n_clusters=c, random_state=30)
         labels = kmeans.fit_predict(patient_features)
 
+        stage_map = {0: "Early", 1: "Severe", 2: "Moderate", 3: "Advanced"}
+        labels = np.array([stage_map[c] for c in labels])
+
         return labels
 
     @staticmethod
     def _visualize(patient_features, labels):
-        umap = UMAP(n_neighbors=8, min_dist=0.1)
+        '''
+        Helper function for make_visual
+        
+        patient_features: Calculated features array
+        labels: Labels from KMeans clustering
+        '''
+        umap = UMAP(n_neighbors=9, min_dist=0.1)
         emb_2d = umap.fit_transform(patient_features)
 
-        plt.scatter(emb_2d[:,0], emb_2d[:,1], c=labels, s=50)
+        colors = {"Early": "#440154","Moderate": "#30678d","Advanced": "#35b779","Severe": "#fde725"}
+
+        for stage in np.unique(labels):
+            plt.scatter(emb_2d[labels == stage, 0], emb_2d[labels == stage, 1], color=colors[stage], s=50, label=stage)
+ 
         plt.xlabel('UMAP1')
         plt.ylabel('UMAP2')
-        plt.title('Patient VF Trajectory Embeddings')
+        plt.legend()
+        plt.title('Glaucomatous VF Clustering')
         plt.savefig('unsupervised_model/pt_clustering.png')
         plt.close()
 
@@ -99,6 +113,7 @@ class Unsupervised_Model():
             (default 7)
         c - number of clusters for KMeans
             (default 4)
+            WARNING: changing c will break the labeling system
         '''
         self.patients, self.masks = self.create_VFdata(self.data)
         flat_scaled, valid_rows = self.scale_VF_data(self.patients, self.masks)
