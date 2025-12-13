@@ -1,5 +1,5 @@
 # Chem 277B — Machine Learning Algorithms
-## Convolutional Neural Network Analysis of Visual Field Maps for Early Diagnosis and Prediction of Glaucoma Progression
+## Machine Learning Applications for Visual Field Analysis: A Study of Vision Loss Progression
 Team 1 — UC Berkeley, College of Chemistry
 
 Contributors: David Houshangi, Lily Hirano, Kirk Ehmsen, Christian Fernandez, Yash Maheshwaran
@@ -46,10 +46,19 @@ Standardize map formats so models trained on UW data can generalize to GRAPE, en
 
 # 3. Repository Structure
 
-
-
-
-
+project-root/
+README.md  
+requirements.txt  
+.gitignore   
+data/
+pkl_data/
+EDA/
+unsupervised_model/
+RandomForest_model/
+gradient_boosting/
+CNN/
+LSTM/
+           
 
 # 4. Methods 
 
