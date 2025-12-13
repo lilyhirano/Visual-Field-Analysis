@@ -24,19 +24,23 @@ Together, these datasets allow us to study glaucoma progression using real funct
 
 Cluster visual fields into meaningful glaucoma subtypes based on the spatial pattern and rate of deterioration.
 
-**2.2 Random Forest Regression**
+**2.2 Gradient Boost Regression**
+
+Predict long-term progression (MS slope) from baseline, early-window, and MS acceleration features. Identify the strongest feature predictors of decline.
+
+**2.3 Random Forest Regression**
 
 Predict long-term progression (MS slope) from baseline VF features and identify the strongest physiological predictors of decline.
 
-**2.3 CNN-Based VF Classification**
+**2.4 CNN-Based VF Classification**
 
 Train convolutional neural networks to classify VF maps into severity categories by learning spatial patterns of damage.
 
-**2.4 LSTM-Based Progression Modeling**
+**2.5 LSTM-Based Progression Modeling**
 
 Use longitudinal VF sequences to model temporal dynamics and predict how damage evolves over time.
 
-**2.5 Dataset Alignment**
+**2.6 Dataset Alignment**
 
 Standardize map formats so models trained on UW data can generalize to GRAPE, enabling cross-dataset comparisons.
 
@@ -51,7 +55,7 @@ Standardize map formats so models trained on UW data can generalize to GRAPE, en
 
 - Unsupervised Learning: PCA + KMeans + UMAP for clustering VF progression patterns
 
-- Gradient Boosting:
+- Gradient Boosting: Predict slope of MS loss; extract feature importances
 
 - Random Forest Regression: Predict slope of MS loss; extract feature importances
 
