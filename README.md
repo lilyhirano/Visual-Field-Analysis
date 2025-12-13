@@ -91,3 +91,11 @@ Huang et al. GRAPE: A multi-modal dataset of longitudinal follow-up visual field
 
 2. UW Biomedical AI Dataset
 Wang et al. A large-scale clinical visual field database for glaucoma analysis.
+
+3. Centers for Disease Control and Prevention. (2024, May 15). Fast facts: Vision loss. U.S. Department of Health and Human Services. https://www.cdc.gov/vision-health/data-research/vision-loss-facts/index.html
+   
+4. Huang, X., Kong, X., Shen, Z. et al. GRAPE: A multi-modal dataset of longitudinal follow-up visual field and fundus images for glaucoma management. Sci Data 10, 520 (2023). https://doi.org/10.1038/s41597-023-02424-4
+   
+5. Giovanni Montesano, Andrew Chen, Randy Lu, Cecilia S. Lee, Aaron Y. Lee; UWHVF: A Real-World, Open Source Dataset of Perimetry Tests From the Humphrey Field Analyzer at the University of Washington. Trans. Vis. Sci. Tech. 2022;11(1):2. doi: https://doi.org/10.1167/tvst.11.1.1.
+
+6. Boden, C., et al. (2004). Patterns of glaucomatous visual field progression: Defects expand in areas of prior loss. American Journal of Ophthalmology, 138(5), 802–808. https://doi.org/10.1016/j.ajo.2004.07.00 
