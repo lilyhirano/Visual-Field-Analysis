@@ -47,16 +47,27 @@ Standardize map formats so models trained on UW data can generalize to GRAPE, en
 # 3. Repository Structure
 
 project-root/
+
 README.md  
+
 requirements.txt  
+
 .gitignore   
+
 data/
+
 pkl_data/
+
 EDA/
+
 unsupervised_model/
+
 RandomForest_model/
+
 gradient_boosting/
+
 CNN/
+
 LSTM/
            
 
