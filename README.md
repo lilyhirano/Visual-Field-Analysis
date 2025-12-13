@@ -32,9 +32,9 @@ Predict long-term progression (MS slope) from baseline, early-window, and MS acc
 
 Predict long-term progression (MS slope) from baseline VF features and identify the strongest physiological predictors of decline. We also evaluated a classification setting by binning slopes into stable, slow, and fast progression groups, which yielded more reliable performance than direct slope prediction.
 
-**2.4 CNN-Based VF Classification**
+**2.4 CNN-Based VF Prediction from Color Fundus Photographs**
 
-Train convolutional neural networks to classify VF maps into severity categories by learning spatial patterns of damage.
+Train a convolutional neural network to predict VF sensitivity points (dB) by learning spatial patterns of retinal optic nerve head (ONH) damage in color fundus photographs paired with 58 VF data points multi-regression targets.
 
 **2.5 LSTM-Based Progression Modeling**
 
@@ -79,7 +79,7 @@ LSTM/
 
 - Random Forest Regression: Predict slope of MS loss; extract feature importances
 
-- CNN Models: Classify VF severity from interpolated VF maps
+- CNN Model: Predict VF sensitivity values from color fundus photographs
 
 - LSTM Models: Sequence-based prediction of future sensitivity loss
 
