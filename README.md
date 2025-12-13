@@ -1,5 +1,5 @@
 # Chem 277B — Machine Learning Algorithms
-## Convolutional Neural Network Analysis of Visual Field Maps for Early Diagnosis and Prediction of Glaucoma Progression
+## Machine Learning Applications for Visual Field Analysis: A Study of Vision Loss Progression
 Team 1 — UC Berkeley, College of Chemistry
 
 Contributors: David Houshangi, Lily Hirano, Kirk Ehmsen, Christian Fernandez, Yash Maheshwaran
@@ -24,34 +24,58 @@ Together, these datasets allow us to study glaucoma progression using real funct
 
 Cluster visual fields into meaningful glaucoma subtypes based on the spatial pattern and rate of deterioration.
 
-**2.2 Random Forest Regression**
+**2.2 Gradient Boost Regression**
 
-Predict long-term progression (MS slope) from baseline VF features and identify the strongest physiological predictors of decline.
+Predict long-term progression (MS slope) from baseline, early-window, and MS acceleration features. Identify the strongest feature predictors of decline.
 
-**2.3 CNN-Based VF Classification**
+**2.3 Random Forest Regression**
+
+Predict long-term progression (MS slope) from baseline VF features and identify the strongest physiological predictors of decline. We also evaluated a classification setting by binning slopes into stable, slow, and fast progression groups, which yielded more reliable performance than direct slope prediction.
+
+**2.4 CNN-Based VF Classification**
 
 Train convolutional neural networks to classify VF maps into severity categories by learning spatial patterns of damage.
 
-**2.4 LSTM-Based Progression Modeling**
+**2.5 LSTM-Based Progression Modeling**
 
 Use longitudinal VF sequences to model temporal dynamics and predict how damage evolves over time.
 
-**2.5 Dataset Alignment**
+**2.6 Dataset Alignment**
 
 Standardize map formats so models trained on UW data can generalize to GRAPE, enabling cross-dataset comparisons.
 
 # 3. Repository Structure
 
+project-root/
 
+README.md  
 
+requirements.txt  
 
+.gitignore   
 
+data/
+
+pkl_data/
+
+EDA/
+
+unsupervised_model/
+
+RandomForest_model/
+
+gradient_boosting/
+
+CNN/
+
+LSTM/
+           
 
 # 4. Methods 
 
 - Unsupervised Learning: PCA + KMeans + UMAP for clustering VF progression patterns
 
-- Gradient Boosting:
+- Gradient Boosting: Predict slope of MS loss; extract feature importances
 
 - Random Forest Regression: Predict slope of MS loss; extract feature importances
 
@@ -67,3 +91,11 @@ Huang et al. GRAPE: A multi-modal dataset of longitudinal follow-up visual field
 
 2. UW Biomedical AI Dataset
 Wang et al. A large-scale clinical visual field database for glaucoma analysis.
+
+3. Centers for Disease Control and Prevention. (2024, May 15). Fast facts: Vision loss. U.S. Department of Health and Human Services. https://www.cdc.gov/vision-health/data-research/vision-loss-facts/index.html
+   
+4. Huang, X., Kong, X., Shen, Z. et al. GRAPE: A multi-modal dataset of longitudinal follow-up visual field and fundus images for glaucoma management. Sci Data 10, 520 (2023). https://doi.org/10.1038/s41597-023-02424-4
+   
+5. Giovanni Montesano, Andrew Chen, Randy Lu, Cecilia S. Lee, Aaron Y. Lee; UWHVF: A Real-World, Open Source Dataset of Perimetry Tests From the Humphrey Field Analyzer at the University of Washington. Trans. Vis. Sci. Tech. 2022;11(1):2. doi: https://doi.org/10.1167/tvst.11.1.1.
+
+6. Boden, C., et al. (2004). Patterns of glaucomatous visual field progression: Defects expand in areas of prior loss. American Journal of Ophthalmology, 138(5), 802–808. https://doi.org/10.1016/j.ajo.2004.07.00 
