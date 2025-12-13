@@ -30,7 +30,7 @@ Predict long-term progression (MS slope) from baseline, early-window, and MS acc
 
 **2.3 Random Forest Regression**
 
-Predict long-term progression (MS slope) from baseline VF features and identify the strongest physiological predictors of decline.
+Predict long-term progression (MS slope) from baseline VF features and identify the strongest physiological predictors of decline. We also evaluated a classification setting by binning slopes into stable, slow, and fast progression groups, which yielded more reliable performance than direct slope prediction.
 
 **2.4 CNN-Based VF Classification**
 
